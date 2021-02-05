@@ -3,19 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class Grade extends Model
+class Grade extends Pivot
 {
     use HasFactory;
 
+    protected $table = 'grades';
+
     protected $fillable = [
-        'nis',
-        'course_teacher_id',
+        'classes_student_id',
+        'schedule_id',
 
         'grade',
-        'index',
-        'semester',
     ];
 
     protected $casts = [

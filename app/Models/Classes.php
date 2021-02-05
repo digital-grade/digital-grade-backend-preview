@@ -20,8 +20,13 @@ class Classes extends Model
         'updated_at' => 'datetime',
     ];
 
-    public function user()
+    public function student()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(Student::class)->using(ClassesStudent::class);
+    }
+
+    public function schedule()
+    {
+        return $this->hasMany(Schedule::class);
     }
 }

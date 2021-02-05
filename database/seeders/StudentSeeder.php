@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Classes;
+use App\Models\ClassesStudent;
 use App\Models\Student;
 use Illuminate\Database\Seeder;
 use bheller\ImagesGenerator\ImagesGeneratorProvider;
@@ -26,12 +27,13 @@ class StudentSeeder extends Seeder
         $classes = Classes::all()->pluck('id');
 
         for ($i = 0; $i < 15; $i++) {
+            $nis = $faker->numberBetween(100000000000, 999999999999);
+
             $student = new Student();
             $student->name = $faker->firstName . " " . $faker->lastName;
-            $student->class_id = $faker->randomElement($classes);
             $student->phone_number = $faker->phoneNumber;
             $student->nisn = $faker->numberBetween(100000000000, 999999999999);
-            $student->nis = $faker->numberBetween(100000000000, 999999999999);
+            $student->nis = $nis;
             $student->email = $faker->email;
             
             $student->address = $faker->address;
@@ -55,6 +57,11 @@ class StudentSeeder extends Seeder
             $student->profile_picture_url = $filenamePath;
 
             $student->save();
+
+            ClassesStudent::create([
+                'student_nis' => $nis,
+                'classes_id' => $faker->randomElement($classes)
+            ]);
         }
     }
 }

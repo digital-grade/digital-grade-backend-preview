@@ -18,7 +18,6 @@ class ListStudentResource extends JsonResource
             'nis' => $this->nis,
             'nisn' => $this->nisn,
             'name' => $this->name,
-            'class' => $this->class == null ? null : $this->class->name,
             'email' => $this->email,
             'phone_number' => $this->phone_number,
             'place_of_birth' => $this->place_of_birth,

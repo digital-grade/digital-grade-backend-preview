@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\TeacherController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\ClassController;
+use App\Http\Controllers\Api\GradeController;
 use App\Http\Controllers\Api\ScheduleController;
 use App\Http\Controllers\Api\SchoolYearController;
 use App\Http\Controllers\Api\UserController;
@@ -91,5 +92,12 @@ Route::group(['prefix' => 'school-year'], function () {
     Route::put('{id}/update', [SchoolYearController::class, 'update']);
     Route::delete('{id}/delete', [SchoolYearController::class, 'delete']);
     Route::get('get-school-year', [SchoolYearController::class, 'getSchoolYear']);
+});
+/** End For School Year */
+
+/** For School Year */
+Route::group(['prefix' => 'grade'], function () {
+    Route::get('{scheduleId}/get-data', [GradeController::class, 'getGradeByClass']);
+    Route::post('save-data', [GradeController::class, 'saveGradeByClass']);
 });
 /** End For School Year */

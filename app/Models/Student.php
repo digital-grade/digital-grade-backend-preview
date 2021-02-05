@@ -14,8 +14,6 @@ class Student extends Model
     protected $fillable = [
         'nis', // primary
 
-        'classes_id',
-
         'nisn',
         'name',
         'email',
@@ -36,7 +34,7 @@ class Student extends Model
 
     public function class()
     {
-        return $this->belongsTo(Classes::class);
+        return $this->belongsToMany(Classes::class)->using(ClassesStudent::class);
     }
 
     public function courseTeacher()
