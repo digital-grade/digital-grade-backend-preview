@@ -9,10 +9,11 @@ use App\Models\Grade;
 use App\Models\Schedule;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use PDF;
 
 class GradeController extends Controller
 {
-    public function getGradeByClass(Request $request, $scheduleId)
+    public function getGradeBySchedule(Request $request, $scheduleId)
     {
         $search = $request->search;
 
@@ -78,5 +79,94 @@ class GradeController extends Controller
                 ]);
             }
         }
+    }
+
+    public function getGradeByClass(Request $request, $classId)
+    {
+        $semester = $request->semester == 0 ? 1 : 2;
+        $nis = $request->nis;
+
+        $schedules = Schedule::with(['schoolYear', 'course'])
+            ->whereHas('schoolYear', function ($x) use ($semester) {
+                $x->where('semester', $semester);
+            })
+            ->where('class_id', $classId)
+            ->get();
+           
+        $listGrades = [];
+        foreach ($schedules as $schedule) {
+            $grade = Grade::where('schedule_id', $schedule->id)->first();
+
+            if (!is_null($grade)) {
+                $listGrades[] = [
+                    'course' => $schedule->course->name,
+                    'grade' => $grade->grade,
+                    'status' => 'Sudah Diisi',
+                ];
+            } else {
+                $listGrades[] = [
+                    'course' => $schedule->course->name,
+                    'grade' => 0,
+                    'status' => 'Belum Diisi',
+                ];
+            }
+        }
+
+        return response()->json($listGrades);
+    }
+
+    public function printRaport(Request $request, $classId)
+    {
+        $semester = $request->semester == 0 ? 1 : 2;
+        $nis = $request->nis;
+
+        $student = Student::find($nis);
+        $class = Classes::find($classId);
+
+        $schedules = Schedule::with(['schoolYear', 'course'])
+            ->whereHas('schoolYear', function ($x) use ($semester) {
+                $x->where('semester', $semester);
+            })
+            ->where('class_id', $classId)
+            ->get();
+           
+        $listGrades = [];
+        $startYear = 0;
+        $endYear = 0;
+        foreach ($schedules as $schedule) {
+            $grade = Grade::where('schedule_id', $schedule->id)->first();
+
+            $startYear = $schedule->schoolYear->start_year;
+            $endYear = $schedule->schoolYear->end_year;
+
+            if (!is_null($grade)) {
+                $listGrades[] = [
+                    'course' => $schedule->course->name,
+                    'grade' => $grade->grade,
+                    'status' => 'Sudah Diisi',
+                ];
+            } else {
+                $listGrades[] = [
+                    'course' => $schedule->course->name,
+                    'grade' => 0,
+                    'status' => 'Belum Diisi',
+                ];
+            }
+        }
+
+        $pdf = PDF::loadView('raport', [
+            'nis' => $nis,
+            'nisn' => $student->nisn,
+            'name' => $student->name,
+            'semester' => $semester,
+            'startYear' => $startYear,
+            'endYear' => $endYear,
+            'class' => $class->name,
+            'grades' => $listGrades,
+        ]);
+
+        $pdf->setPaper('A4');
+
+        return $pdf->download('report.pdf');
     }
 }

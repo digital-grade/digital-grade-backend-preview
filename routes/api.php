@@ -70,6 +70,7 @@ Route::group(['prefix' => 'class'], function () {
     Route::put('{id}/update', [ClassController::class, 'update']);
     Route::delete('{id}/delete', [ClassController::class, 'delete']);
     Route::get('search-class-by-name', [ClassController::class, 'searchClassByName']);
+    Route::get('{nis}/get-class-by-nis', [ClassController::class, 'getClassByNis']);
 });
 /** End For Class */
 
@@ -81,6 +82,7 @@ Route::group(['prefix' => 'schedule'], function () {
     Route::put('{id}/update', [ScheduleController::class, 'update']);
     Route::delete('{id}/delete', [ScheduleController::class, 'delete']);
     Route::get('{nip}/get-schedule-by-nip', [ScheduleController::class, 'getScheduleByNip']);
+    Route::get('{classId}/get-schedule-by-class', [ScheduleController::class, 'getScheduleByClass']);
 });
 /** End For Schedule */
 
@@ -97,7 +99,9 @@ Route::group(['prefix' => 'school-year'], function () {
 
 /** For School Year */
 Route::group(['prefix' => 'grade'], function () {
-    Route::get('{scheduleId}/get-data', [GradeController::class, 'getGradeByClass']);
+    Route::get('{scheduleId}/get-data', [GradeController::class, 'getGradeBySchedule']);
+    Route::get('{classId}/get-grade-by-class', [GradeController::class, 'getGradeByClass']);
+    Route::get('{classId}/print-raport', [GradeController::class, 'printRaport']);
     Route::post('save-data', [GradeController::class, 'saveGradeByClass']);
 });
 /** End For School Year */

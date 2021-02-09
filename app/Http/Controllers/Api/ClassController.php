@@ -86,4 +86,22 @@ class ClassController extends Controller
 
         return response()->json($classes);
     }
+
+    public function getClassByNis(Request $request, $nis)
+    {
+        $search = $request->search;
+        $perPage = $request->query('per_page', 10);
+        $orderBy = $request->query('sort_field', 'courses.name');
+        $orderDirection = $request->query('sort_order', 'desc');
+
+        $classes = Classes::with(['student'])
+            ->whereHas('student', function ($x) use ($nis) {
+                $x->where('nis', $nis);
+            })
+            ->where('name', 'LIKE', '%' . $search . '%');
+
+        $classes = $classes->orderBy($orderBy, $orderDirection)->paginate($perPage);
+
+        return ListClassResource::collection($classes);
+    }
 }

@@ -139,4 +139,35 @@ class ScheduleController extends Controller
 
         return ListScheduleResource::collection($schedules);
     }
+
+    public function getScheduleByClass(Request $request, $classId)
+    {
+        $search = $request->search;
+        $perPage = $request->query('per_page', 10);
+        $orderBy = $request->query('sort_field', 'day');
+        $orderDirection = $request->query('sort_order', 'asc');
+        $semester = $request->semester == 0 ? 1 : 2;
+
+        $schedules = Schedule::with(['teacher', 'class', 'course', 'schoolYear'])
+            ->where(function ($x) use ($search) {
+                $x->whereHas('teacher', function ($x) use ($search) {
+                    $x->where('name', 'LIKE', '%' . $search . '%');
+                })
+                ->orWhereHas('class', function ($x) use ($search) {
+                    $x->where('name', 'LIKE', '%' . $search . '%');
+                })
+                ->orWhereHas('course', function ($x) use ($search) {
+                    $x->where('name', 'LIKE', '%' . $search . '%');
+                })
+                ->orWhere('day', 'LIKE', '%' . $search . '%');
+            })
+            ->whereHas('schoolYear', function ($x) use ($semester) {
+                $x->where('semester', $semester);
+            })
+            ->where('class_id', $classId);
+
+        $schedules = $schedules->orderBy($orderBy, $orderDirection)->paginate($perPage);
+
+        return ListScheduleResource::collection($schedules);
+    }
 }
