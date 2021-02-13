@@ -22,14 +22,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/login', [AuthController::class, 'login']);
-// Route::post('/forgot-password', [UserController::class, 'forgotPassword']);
-// Route::put('/reset-password', [UserController::class, 'updatePasswordUsingToken']);
-
-/** For get user info from token */
-Route::get('token/user/detail', [UserController::class, 'getUserInfoFromToken']);
-/** End for get user info from token */
-
 /** For Teacher */
 Route::group(['prefix' => 'teacher'], function () {
     Route::get('/', [TeacherController::class, 'index']);
@@ -90,9 +82,6 @@ Route::group(['prefix' => 'schedule'], function () {
 Route::group(['prefix' => 'school-year'], function () {
     Route::get('/', [SchoolYearController::class, 'index']);
     Route::post('/', [SchoolYearController::class, 'create']);
-    Route::get('{id}/show', [SchoolYearController::class, 'show']);
-    Route::put('{id}/update', [SchoolYearController::class, 'update']);
-    Route::delete('{id}/delete', [SchoolYearController::class, 'delete']);
     Route::get('get-school-year', [SchoolYearController::class, 'getSchoolYear']);
 });
 /** End For School Year */

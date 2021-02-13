@@ -7,6 +7,7 @@ use App\Http\Resources\SchoolYear\ListSchoolYearResource;
 use App\Models\SchoolYear;
 use Illuminate\Http\Request;
 use Validator;
+use DB;
 
 class SchoolYearController extends Controller
 {
@@ -17,8 +18,14 @@ class SchoolYearController extends Controller
         $orderBy = $request->query('sort_field', 'name');
         $orderDirection = $request->query('sort_order', 'desc');
 
-        $schoolYears = SchoolYear::where('start_year', 'LIKE', '%' . $search . '%')
-            ->orWhere('end_year', 'LIKE', '%' . $search . '%');
+        $schoolYears = SchoolYear::select(
+            DB::raw('school_years.id as id'),
+            'start_year',
+            'end_year',
+        )
+            ->where('start_year', 'LIKE', '%' . $search . '%')
+            ->orWhere('end_year', 'LIKE', '%' . $search . '%')
+            ->groupBy('start_year', 'end_year');
 
         $schoolYears = $schoolYears->orderBy($orderBy, $orderDirection)->paginate($perPage);
 
@@ -34,55 +41,15 @@ class SchoolYearController extends Controller
 
     public function create(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'start_year' => 'required',
-            'end_year' => 'required',
-            'semester' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                "message" => $validator->errors()
-            ], 400);
+        $schoolYear = SchoolYear::orderBy('id', 'desc')->first();
+        
+        for ($i = 1; $i <= 2; $i++) {
+            $newSchoolYear = SchoolYear::create([
+                'start_year' => $schoolYear->end_year,
+                'end_year' => $schoolYear->end_year + 1,
+                'semester' => $i,
+            ]);
         }
-
-        $schoolYear = new SchoolYear();
-        $schoolYear->start_year = $request->start_year;
-        $schoolYear->end_year = $request->end_year;
-        $schoolYear->semester = $request->semester;
-        $schoolYear->save();
-
-        return response()->json($schoolYear);
-    }
-
-    public function update($nis, Request $request)
-    {
-        $schoolYear = SchoolYear::whereNis($nis)->first();
-
-        $validator = Validator::make($request->all(), [
-            'start_year' => 'required',
-            'end_year' => 'required',
-            'semester' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                "message" => $validator->errors()
-            ], 400);
-        }
-
-        $schoolYear->start_year = $request->start_year;
-        $schoolYear->end_year = $request->end_year;
-        $schoolYear->semester = $request->semester;
-        $schoolYear->save();
-
-        return response()->json($schoolYear);
-    }
-
-    public function delete($nis)
-    {
-        $schoolYear = SchoolYear::whereNis($nis)->first();
-        $schoolYear->delete();
 
         return response()->json($schoolYear);
     }
