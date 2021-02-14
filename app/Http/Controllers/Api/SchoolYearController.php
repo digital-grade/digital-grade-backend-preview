@@ -56,7 +56,7 @@ class SchoolYearController extends Controller
 
     public function getSchoolYear()
     {
-        $schoolYear = SchoolYear::orderBy('id', 'DESC')->get()->take(2);
+        $schoolYear = SchoolYear::orderBy('id', 'DESC')->get()->take(10);
 
         return response()->json($schoolYear);
     }

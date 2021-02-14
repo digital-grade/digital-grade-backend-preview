@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ListScheduleResource;
+use App\Http\Resources\Schedule\ListScheduleResource;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
 use Validator;
